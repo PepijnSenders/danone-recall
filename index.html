@@ -385,11 +385,23 @@
       border-top: 1px solid var(--gray-100);
     }
     .product-card.open .product-body { display: block; }
+    .batch-table-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--gray-400);
+      padding: 8px 8px 4px;
+      border-bottom: 1px solid var(--gray-100);
+      margin-top: 8px;
+    }
     .batch-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 4px 16px;
-      padding-top: 12px;
+      padding-top: 4px;
     }
     .batch-row {
       display: flex;
@@ -1274,9 +1286,8 @@ function checkBatch() {
       </div>
       <div class="result-detail">
         <strong>${m.product.name}</strong> (${m.product.size})<br>
-        Country: ${m.flag} ${m.country}<br>
-        Best before: ${m.batch.e}<br>
-        Packaging: ${m.product.pkg}
+        ${m.flag} ${m.country}<br>
+        <span style="color:var(--gray-400)">Batch/Lot:</span> <strong>${m.batch.b}</strong> &nbsp; <span style="color:var(--gray-400)">Best before:</span> ${m.batch.e}
       </div>
       <div class="result-action">
         Do not use this product. Return it to the store for a full refund or contact your local helpline below.
@@ -1336,6 +1347,10 @@ function renderProducts() {
         </div>
       </div>
       <div class="product-body">
+        <div class="batch-table-head">
+          <span>Batch / Lot</span>
+          <span>Best before</span>
+        </div>
         <div class="batch-grid">
           ${p.batches.map(b => `
             <div class="batch-row">
