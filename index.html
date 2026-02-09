@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nutrilon Recall Checker – Controleer je product</title>
+  <meta name="description" content="Controleer of jouw Nutrilon product is teruggeroepen door Danone. Voer het batchnummer in om te checken.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+    .header {
+      background: #fff;
+      border-bottom: 3px solid #e63946;
+      padding: 1.5rem 1rem;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+    .header p {
+      color: #666;
+      margin-top: 0.25rem;
+      font-size: 0.9rem;
+    }
+    .banner {
+      background: #e63946;
+      color: #fff;
+      text-align: center;
+      padding: 0.6rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .banner a { color: #fff; text-decoration: underline; }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem;
+    }
+    .search-box {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+    }
+    .search-box label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+    .search-box .hint {
+      color: #888;
+      font-size: 0.8rem;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .input-row input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-row input:focus {
+      border-color: #0066cc;
+    }
+    .input-row button {
+      padding: 0.75rem 1.25rem;
+      background: #0066cc;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .input-row button:hover { background: #0052a3; }
+
+    .result {
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .result.danger {
+      display: block;
+      background: #fef2f2;
+      border: 2px solid #e63946;
+    }
+    .result.danger .icon { font-size: 2rem; }
+    .result.danger h3 { color: #b91c1c; font-size: 1.1rem; margin: 0.5rem 0 0.25rem; }
+    .result.danger p { color: #7f1d1d; font-size: 0.9rem; line-height: 1.5; }
+    .result.danger .product-info {
+      background: #fff;
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    .result.danger .product-info strong { color: #b91c1c; }
+
+    .result.safe {
+      display: block;
+      background: #f0fdf4;
+      border: 2px solid #22c55e;
+    }
+    .result.safe .icon { font-size: 2rem; }
+    .result.safe h3 { color: #166534; font-size: 1.1rem; margin: 0.5rem 0 0.25rem; }
+    .result.safe p { color: #14532d; font-size: 0.9rem; line-height: 1.5; }
+
+    .products-section {
+      margin-top: 2rem;
+    }
+    .products-section h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #1a1a2e;
+    }
+    .product-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+    .product-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    .product-card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .product-card .meta {
+      font-size: 0.8rem;
+      color: #888;
+    }
+    .product-card .batches {
+      display: none;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid #eee;
+    }
+    .product-card.open .batches { display: block; }
+    .batch-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.25rem 1rem;
+      font-size: 0.82rem;
+    }
+    .batch-list .batch-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.2rem 0;
+    }
+    .batch-list .batch-item .bn { font-weight: 600; font-family: monospace; }
+    .batch-list .batch-item .exp { color: #888; }
+
+    .footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #aaa;
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+    .footer a { color: #888; }
+
+    @media (max-width: 480px) {
+      .batch-list { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="banner">
+  Danone/Nutrilon product recall in Nederland &mdash;
+  <a href="https://www.danone.com/content/dam/corp/local/bel/Danone%20recall%20in%20the%20Netherlands%20-%20List%20and%20details%20of%20products%20and%20batches%20(1).pdf" target="_blank" rel="noopener">Officieel PDF</a>
+</div>
+
+<div class="header">
+  <h1>Nutrilon Recall Checker</h1>
+  <p>Controleer of jouw product is teruggeroepen</p>
+</div>
+
+<div class="container">
+  <div class="search-box">
+    <label for="batch-input">Voer je batchnummer in</label>
+    <span class="hint">Je vindt het batchnummer op de onderkant van de verpakking (bijv. 2026.11.02)</span>
+    <div class="input-row">
+      <input type="text" id="batch-input" placeholder="bijv. 2026.11.02" autocomplete="off">
+      <button onclick="checkBatch()">Check</button>
+    </div>
+    <div id="result"></div>
+  </div>
+
+  <div class="products-section">
+    <h2>Alle teruggeroepen producten (14)</h2>
+    <div id="product-list"></div>
+  </div>
+</div>
+
+<div class="footer">
+  Bron: <a href="https://www.danone.com/content/dam/corp/local/bel/Danone%20recall%20in%20the%20Netherlands%20-%20List%20and%20details%20of%20products%20and%20batches%20(1).pdf" target="_blank" rel="noopener">Danone officieel terugroepbericht</a><br>
+  Deze site is niet gelieerd aan Danone. Alleen ter informatie.
+</div>
+
+<script>
+const products = [
+  {
+    name: "Nutrilon AR 2 800G",
+    aliases: "",
+    weight: "800g",
+    packaging: "Eazypack",
+    batches: [
+      { batch: "2026.11.02", expiry: "02-11-2026" }
+    ]
+  },
+  {
+    name: "Nutrilon opvolgmelk 3 800g",
+    aliases: "Nutrilon Pronutra 3 800g / Nutrilon 3 800g",
+    weight: "800g",
+    packaging: "Eazypack",
+    batches: [
+      { batch: "2026.06.19", expiry: "19-06-2026" },
+      { batch: "2026.07.29", expiry: "29-07-2026" },
+      { batch: "2026.09.21", expiry: "21-09-2026" },
+      { batch: "2026.09.22", expiry: "22-09-2026" },
+      { batch: "2026.10.24", expiry: "24-10-2026" },
+      { batch: "2026.11.07", expiry: "07-11-2026" },
+      { batch: "2026.11.28", expiry: "28-11-2026" },
+      { batch: "2026.12.22", expiry: "22-12-2026" }
+    ]
+  },
+  {
+    name: "Nutrilon volledige zuigelingenvoeding 1 800g",
+    aliases: "Nutrilon Pronutra 1 800g / Nutrilon 1 800g",
+    weight: "800g",
+    packaging: "Eazypack",
+    batches: [
+      { batch: "2026.07.13", expiry: "13-07-2026" },
+      { batch: "2026.07.22", expiry: "22-07-2026" },
+      { batch: "2026.09.05", expiry: "05-09-2026" },
+      { batch: "2026.10.16", expiry: "16-10-2026" },
+      { batch: "2026.12.03", expiry: "03-12-2026" }
+    ]
+  },
+  {
+    name: "Nutrilon opvolgmelk 2 800g",
+    aliases: "Nutrilon Pronutra 2 800g / Nutrilon 2 800g",
+    weight: "800g",
+    packaging: "Eazypack",
+    batches: [
+      { batch: "2026.06.07", expiry: "07-06-2026" },
+      { batch: "2026.07.11", expiry: "11-07-2026" },
+      { batch: "2026.07.27", expiry: "27-07-2026" },
+      { batch: "2026.09.09", expiry: "09-09-2026" },
+      { batch: "2026.09.17", expiry: "17-09-2026" },
+      { batch: "2026.10.27", expiry: "27-10-2026" },
+      { batch: "2026.11.21", expiry: "21-11-2026" },
+      { batch: "2026.12.19", expiry: "19-12-2026" }
+    ]
+  },
+  {
+    name: "Nutrilon Content 1 800g",
+    aliases: "",
+    weight: "800g",
+    packaging: "Eazypack",
+    batches: [
+      { batch: "2026.03.04", expiry: "04-03-2026" },
+      { batch: "2029.09.05", expiry: "05-09-2026" }
+    ]
+  },
+  {
+    name: "Nutrilon Duobalans 2 800g",
+    aliases: "",
+    weight: "800g",
+    packaging: "Blik (metaal)",
+    batches: [
+      { batch: "2026.12.27", expiry: "27-12-2026" },
+      { batch: "2027.02.01", expiry: "01-02-2027" },
+      { batch: "2027.07.11", expiry: "11-07-2027" }
+    ]
+  },
+  {
+    name: "Nutrilon Duobalans 1 800g",
+    aliases: "",
+    weight: "800g",
+    packaging: "Blik (metaal)",
+    batches: [
+      { batch: "2027.01.12", expiry: "12-01-2027" },
+      { batch: "2027.05.14", expiry: "14-05-2027" },
+      { batch: "2027.07.10", expiry: "10-07-2027" }
+    ]
+  },
+  {
+    name: "Nutrilon volledige zuigelingenvoeding 1 1.2kg",
+    aliases: "Nutrilon Bib 1.2kg IF",
+    weight: "1.2kg",
+    packaging: "Bag in box",
+    batches: [
+      { batch: "2026.12.04", expiry: "04-12-2026" }
+    ]
+  },
+  {
+    name: "Nutrilon opvolgmelk 2 1.2kg",
+    aliases: "Nutrilon Bib 1.2kg FO",
+    weight: "1.2kg",
+    packaging: "Bag in box",
+    batches: [
+      { batch: "2026.08.26", expiry: "26-08-2026" },
+      { batch: "2026.11.04", expiry: "04-11-2026" },
+      { batch: "2026.11.19", expiry: "19-11-2026" },
+      { batch: "2026.12.28", expiry: "28-12-2026" },
+      { batch: "2027.01.02", expiry: "02-01-2027" },
+      { batch: "2027.02.18", expiry: "18-02-2027" }
+    ]
+  },
+  {
+    name: "Nutrilon volledig zuigelingenvoeding 1 600g",
+    aliases: "Nutrilon Bib 600g IF",
+    weight: "600g",
+    packaging: "Bag in box",
+    batches: [
+      { batch: "2026.08.13", expiry: "13-08-2026" },
+      { batch: "2026.12.05", expiry: "05-12-2026" }
+    ]
+  },
+  {
+    name: "Nutrilon opvolgmelk 2 600g",
+    aliases: "Nutrilon Bib 600g FO",
+    weight: "600g",
+    packaging: "Bag in box",
+    batches: [
+      { batch: "2026.07.26", expiry: "26-07-2026" },
+      { batch: "2026.12.05", expiry: "05-12-2026" },
+      { batch: "2027.01.09", expiry: "09-01-2027" }
+    ]
+  },
+  {
+    name: "Nutrilon tabs volledige zuigelingenvoeding 1 138g",
+    aliases: "Nutrilon tabs 1 IF 138g",
+    weight: "138g",
+    packaging: "Bag",
+    batches: [
+      { batch: "2027.01.01", expiry: "01-01-2027" },
+      { batch: "2027.01.02", expiry: "02-01-2027" },
+      { batch: "2027.01.09", expiry: "09-01-2027" },
+      { batch: "2027.01.10", expiry: "10-01-2027" },
+      { batch: "2027.03.02", expiry: "02-03-2027" },
+      { batch: "2027.03.03", expiry: "03-03-2027" },
+      { batch: "2027.03.07", expiry: "07-03-2027" }
+    ]
+  },
+  {
+    name: "Nutrilon tabs opvolgmelk 2 138g",
+    aliases: "Nutrilon tabs 2 FO 138G",
+    weight: "138g",
+    packaging: "Bag",
+    batches: [
+      { batch: "2027.01.03", expiry: "03-01-2027" },
+      { batch: "2027.01.04", expiry: "04-01-2027" },
+      { batch: "2027.01.05", expiry: "05-01-2027" },
+      { batch: "2027.01.06", expiry: "06-01-2027" },
+      { batch: "2027.01.07", expiry: "07-01-2027" },
+      { batch: "2027.01.08", expiry: "08-01-2027" },
+      { batch: "2027.02.27", expiry: "27-02-2027" },
+      { batch: "2027.02.28", expiry: "28-02-2027" }
+    ]
+  },
+  {
+    name: "Nutrilon Duobalans 1 3x23g",
+    aliases: "",
+    weight: "69g",
+    packaging: "Bag",
+    batches: [
+      { batch: "2026.10.04", expiry: "04-10-2026" }
+    ]
+  }
+];
+
+// Build a lookup: normalized batch -> product(s)
+const batchLookup = {};
+products.forEach(p => {
+  p.batches.forEach(b => {
+    const key = b.batch.replace(/\D/g, '');
+    if (!batchLookup[key]) batchLookup[key] = [];
+    batchLookup[key].push({ product: p, batch: b });
+  });
+});
+
+function normalize(input) {
+  return input.replace(/\D/g, '');
+}
+
+function checkBatch() {
+  const input = document.getElementById('batch-input').value.trim();
+  const resultEl = document.getElementById('result');
+
+  if (!input) {
+    resultEl.className = 'result';
+    resultEl.style.display = 'none';
+    return;
+  }
+
+  const key = normalize(input);
+  const matches = batchLookup[key];
+
+  if (matches && matches.length > 0) {
+    const match = matches[0];
+    resultEl.className = 'result danger';
+    resultEl.innerHTML = `
+      <div class="icon">&#9888;&#65039;</div>
+      <h3>Dit product is teruggeroepen!</h3>
+      <p>Het batchnummer <strong>${match.batch.batch}</strong> komt voor in de terugroeplijst.</p>
+      <div class="product-info">
+        <strong>${match.product.name}</strong><br>
+        ${match.product.aliases ? 'Ook bekend als: ' + match.product.aliases + '<br>' : ''}
+        Verpakking: ${match.product.weight} – ${match.product.packaging}<br>
+        Houdbaar tot: ${match.batch.expiry}
+      </div>
+      <p style="margin-top: 0.75rem;">
+        <strong>Gebruik dit product niet.</strong> Neem contact op met Danone via
+        <strong>0800-0092</strong> of breng het terug naar de winkel.
+      </p>
+    `;
+  } else {
+    resultEl.className = 'result safe';
+    resultEl.innerHTML = `
+      <div class="icon">&#9989;</div>
+      <h3>Niet gevonden in de terugroeplijst</h3>
+      <p>Het batchnummer <strong>${input}</strong> staat niet in de lijst van teruggeroepen producten.
+         Controleer of je het nummer correct hebt ingevoerd.</p>
+    `;
+  }
+}
+
+// Enter key triggers check
+document.getElementById('batch-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkBatch();
+});
+
+// Render product list
+const listEl = document.getElementById('product-list');
+products.forEach((p, i) => {
+  const card = document.createElement('div');
+  card.className = 'product-card';
+  card.innerHTML = `
+    <h3>${p.name}</h3>
+    <div class="meta">
+      ${p.aliases ? p.aliases + ' &middot; ' : ''}${p.weight} &middot; ${p.packaging} &middot; ${p.batches.length} batch${p.batches.length > 1 ? 'es' : ''}
+    </div>
+    <div class="batches">
+      <div class="batch-list">
+        ${p.batches.map(b => `
+          <div class="batch-item">
+            <span class="bn">${b.batch}</span>
+            <span class="exp">THT ${b.expiry}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  card.addEventListener('click', () => card.classList.toggle('open'));
+  listEl.appendChild(card);
+});
+</script>
+
+</body>
+</html>
