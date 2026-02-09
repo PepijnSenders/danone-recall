@@ -1,490 +1,1005 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nutrilon Recall Checker – Controleer je product</title>
-  <meta name="description" content="Controleer of jouw Nutrilon product is teruggeroepen door Danone. Voer het batchnummer in om te checken.">
+  <title>Baby Formula Recall Checker — Danone / Nutrilon / Aptamil / Cow & Gate</title>
+  <meta name="description" content="Check if your baby formula is part of the Danone cereulide recall. Covers Nutrilon, Aptamil, Cow & Gate, Gallia across Europe.">
+  <meta property="og:title" content="Baby Formula Recall Checker">
+  <meta property="og:description" content="Check if your Nutrilon, Aptamil, Cow & Gate or Gallia baby formula is recalled due to cereulide contamination.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f8f9fa;
-      color: #1a1a2e;
-      min-height: 100vh;
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --red: #dc2626;
+      --red-light: #fef2f2;
+      --red-border: #fecaca;
+      --green: #16a34a;
+      --green-light: #f0fdf4;
+      --green-border: #bbf7d0;
+      --blue: #2563eb;
+      --blue-light: #eff6ff;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --radius: 12px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
     }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Alert banner */
+    .alert-banner {
+      background: var(--red);
+      color: #fff;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      letter-spacing: 0.01em;
+    }
+    .alert-banner a { color: #fff; text-decoration: underline; text-underline-offset: 2px; }
+
+    /* Header */
     .header {
       background: #fff;
-      border-bottom: 3px solid #e63946;
-      padding: 1.5rem 1rem;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 32px 16px 28px;
       text-align: center;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--red-light);
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 12px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .header-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
     }
     .header h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #1a1a2e;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--gray-900);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
     }
     .header p {
-      color: #666;
-      margin-top: 0.25rem;
-      font-size: 0.9rem;
+      color: var(--gray-500);
+      margin-top: 6px;
+      font-size: 15px;
     }
-    .banner {
-      background: #e63946;
-      color: #fff;
-      text-align: center;
-      padding: 0.6rem 1rem;
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-    .banner a { color: #fff; text-decoration: underline; }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 1.5rem 1rem;
-    }
-    .search-box {
-      background: #fff;
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-      margin-bottom: 1.5rem;
-    }
-    .search-box label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      font-size: 1rem;
-    }
-    .search-box .hint {
-      color: #888;
-      font-size: 0.8rem;
-      margin-bottom: 0.75rem;
-      display: block;
-    }
-    .input-row {
+    .brand-tags {
       display: flex;
-      gap: 0.5rem;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 14px;
+      flex-wrap: wrap;
     }
-    .input-row input {
+    .brand-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: var(--gray-100);
+      color: var(--gray-600);
+    }
+
+    /* Container */
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    /* Search card */
+    .search-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-200);
+      position: relative;
+    }
+    .search-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--red), #f59e0b, var(--red));
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .search-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+    }
+    .search-hint {
+      font-size: 13px;
+      color: var(--gray-400);
+      margin-bottom: 14px;
+    }
+    .search-row {
+      display: flex;
+      gap: 8px;
+    }
+    .search-row input {
       flex: 1;
-      padding: 0.75rem 1rem;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      font-size: 1rem;
+      padding: 12px 16px;
+      border: 2px solid var(--gray-200);
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: var(--gray-50);
     }
-    .input-row input:focus {
-      border-color: #0066cc;
+    .search-row input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+      background: #fff;
     }
-    .input-row button {
-      padding: 0.75rem 1.25rem;
-      background: #0066cc;
+    .search-row input::placeholder { color: var(--gray-300); }
+    .search-row button {
+      padding: 12px 20px;
+      background: var(--gray-900);
       color: #fff;
       border: none;
-      border-radius: 8px;
-      font-size: 1rem;
+      border-radius: 10px;
+      font-size: 15px;
       font-weight: 600;
+      font-family: 'Inter', sans-serif;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.15s, transform 0.1s;
       white-space: nowrap;
     }
-    .input-row button:hover { background: #0052a3; }
+    .search-row button:hover { background: #000; }
+    .search-row button:active { transform: scale(0.97); }
 
+    /* Results */
     .result {
-      border-radius: 12px;
-      padding: 1.25rem;
-      margin-top: 1rem;
+      margin-top: 16px;
+      border-radius: 10px;
+      padding: 20px;
       display: none;
-      animation: fadeIn 0.3s ease;
+      animation: slideUp 0.3s ease;
     }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     .result.danger {
       display: block;
-      background: #fef2f2;
-      border: 2px solid #e63946;
+      background: var(--red-light);
+      border: 1.5px solid var(--red-border);
     }
-    .result.danger .icon { font-size: 2rem; }
-    .result.danger h3 { color: #b91c1c; font-size: 1.1rem; margin: 0.5rem 0 0.25rem; }
-    .result.danger p { color: #7f1d1d; font-size: 0.9rem; line-height: 1.5; }
-    .result.danger .product-info {
-      background: #fff;
-      border-radius: 8px;
-      padding: 0.75rem;
-      margin-top: 0.75rem;
-      font-size: 0.85rem;
-      line-height: 1.6;
-    }
-    .result.danger .product-info strong { color: #b91c1c; }
-
     .result.safe {
       display: block;
-      background: #f0fdf4;
-      border: 2px solid #22c55e;
+      background: var(--green-light);
+      border: 1.5px solid var(--green-border);
     }
-    .result.safe .icon { font-size: 2rem; }
-    .result.safe h3 { color: #166534; font-size: 1.1rem; margin: 0.5rem 0 0.25rem; }
-    .result.safe p { color: #14532d; font-size: 0.9rem; line-height: 1.5; }
-
-    .products-section {
-      margin-top: 2rem;
+    .result-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
     }
-    .products-section h2 {
-      font-size: 1.1rem;
+    .result-icon {
+      font-size: 28px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .result-header h3 {
+      font-size: 16px;
       font-weight: 700;
-      margin-bottom: 1rem;
-      color: #1a1a2e;
+      margin-bottom: 2px;
     }
+    .result.danger .result-header h3 { color: var(--red); }
+    .result.safe .result-header h3 { color: var(--green); }
+    .result-header p {
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .result.danger .result-header p { color: #991b1b; }
+    .result.safe .result-header p { color: #166534; }
+    .result-detail {
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .result-detail strong { color: var(--red); }
+    .result-action {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: rgba(220,38,38,0.08);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #991b1b;
+    }
+
+    /* Info cards */
+    .info-section {
+      margin-top: 28px;
+      display: grid;
+      gap: 12px;
+    }
+    .info-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 20px;
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow-sm);
+    }
+    .info-card h3 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-400);
+      margin-bottom: 8px;
+    }
+    .info-card p {
+      font-size: 14px;
+      color: var(--gray-600);
+      line-height: 1.6;
+    }
+    .info-card a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .info-card a:hover { text-decoration: underline; }
+
+    /* Country tabs */
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-top: 36px;
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--gray-400);
+      margin-bottom: 16px;
+    }
+    .country-tabs {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 16px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .country-tabs::-webkit-scrollbar { display: none; }
+    .country-tab {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      border: 1.5px solid var(--gray-200);
+      background: #fff;
+      color: var(--gray-600);
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .country-tab:hover { border-color: var(--gray-300); background: var(--gray-50); }
+    .country-tab.active {
+      background: var(--gray-900);
+      color: #fff;
+      border-color: var(--gray-900);
+    }
+    .country-tab .flag { margin-right: 4px; }
+
+    /* Product cards */
     .product-card {
       background: #fff;
       border-radius: 10px;
-      padding: 1rem;
-      margin-bottom: 0.75rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border: 1px solid var(--gray-200);
+      margin-bottom: 8px;
+      overflow: hidden;
+      transition: box-shadow 0.15s;
+    }
+    .product-card:hover { box-shadow: var(--shadow); }
+    .product-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
       cursor: pointer;
-      transition: box-shadow 0.2s;
+      user-select: none;
     }
-    .product-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
-    .product-card h3 {
-      font-size: 0.95rem;
+    .product-header-left h4 {
+      font-size: 14px;
       font-weight: 600;
-      margin-bottom: 0.25rem;
+      color: var(--gray-900);
     }
-    .product-card .meta {
-      font-size: 0.8rem;
-      color: #888;
+    .product-header-left .product-meta {
+      font-size: 12px;
+      color: var(--gray-400);
+      margin-top: 2px;
     }
-    .product-card .batches {
+    .product-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--red-light);
+      color: var(--red);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .chevron {
+      width: 18px;
+      height: 18px;
+      color: var(--gray-400);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+    .product-card.open .chevron { transform: rotate(180deg); }
+    .product-body {
       display: none;
-      margin-top: 0.75rem;
-      padding-top: 0.75rem;
-      border-top: 1px solid #eee;
+      padding: 0 16px 14px;
+      border-top: 1px solid var(--gray-100);
     }
-    .product-card.open .batches { display: block; }
-    .batch-list {
+    .product-card.open .product-body { display: block; }
+    .batch-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0.25rem 1rem;
-      font-size: 0.82rem;
+      gap: 4px 16px;
+      padding-top: 12px;
     }
-    .batch-list .batch-item {
+    .batch-row {
       display: flex;
       justify-content: space-between;
-      padding: 0.2rem 0;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
     }
-    .batch-list .batch-item .bn { font-weight: 600; font-family: monospace; }
-    .batch-list .batch-item .exp { color: #888; }
+    .batch-row:nth-child(odd) { background: var(--gray-50); }
+    .batch-num { font-weight: 600; font-family: 'SF Mono', 'Fira Code', monospace; color: var(--gray-800); }
+    .batch-exp { color: var(--gray-400); }
 
+    /* Contact cards */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .contact-card {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid var(--gray-200);
+      padding: 14px;
+    }
+    .contact-card .cc-country {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 6px;
+    }
+    .contact-card .cc-line {
+      font-size: 12px;
+      color: var(--gray-500);
+      line-height: 1.5;
+    }
+    .contact-card .cc-phone {
+      font-weight: 600;
+      color: var(--blue);
+    }
+
+    /* Footer */
     .footer {
       text-align: center;
-      padding: 2rem 1rem;
-      color: #aaa;
-      font-size: 0.75rem;
-      line-height: 1.6;
+      padding: 32px 16px;
+      border-top: 1px solid var(--gray-200);
+      margin-top: 40px;
     }
-    .footer a { color: #888; }
+    .footer p {
+      font-size: 12px;
+      color: var(--gray-400);
+      line-height: 1.8;
+    }
+    .footer a { color: var(--gray-500); text-decoration: underline; text-underline-offset: 2px; }
+    .footer .sources {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 4px 12px;
+    }
 
     @media (max-width: 480px) {
-      .batch-list { grid-template-columns: 1fr; }
+      .header h1 { font-size: 22px; }
+      .batch-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .search-row { flex-direction: column; }
+      .search-row button { text-align: center; }
     }
   </style>
 </head>
 <body>
 
-<div class="banner">
-  Danone/Nutrilon product recall in Nederland &mdash;
-  <a href="https://www.danone.com/content/dam/corp/local/bel/Danone%20recall%20in%20the%20Netherlands%20-%20List%20and%20details%20of%20products%20and%20batches%20(1).pdf" target="_blank" rel="noopener">Officieel PDF</a>
+<div class="alert-banner">
+  Cereulide toxin detected in baby formula across Europe &mdash; <a href="https://www.danone.com/newsroom/press-releases/recall-specific-infant-formula-batches.html" target="_blank">Danone official statement</a>
 </div>
 
 <div class="header">
-  <h1>Nutrilon Recall Checker</h1>
-  <p>Controleer of jouw product is teruggeroepen</p>
+  <div class="header-badge">Active recall</div>
+  <h1>Baby Formula Recall Checker</h1>
+  <p>Check if your product is affected by the Danone recall</p>
+  <div class="brand-tags">
+    <span class="brand-tag">Nutrilon</span>
+    <span class="brand-tag">Aptamil</span>
+    <span class="brand-tag">Cow & Gate</span>
+    <span class="brand-tag">Gallia</span>
+    <span class="brand-tag">Milumil</span>
+  </div>
 </div>
 
 <div class="container">
-  <div class="search-box">
-    <label for="batch-input">Voer je batchnummer in</label>
-    <span class="hint">Je vindt het batchnummer op de onderkant van de verpakking (bijv. 2026.11.02)</span>
-    <div class="input-row">
-      <input type="text" id="batch-input" placeholder="bijv. 2026.11.02" autocomplete="off">
+
+  <!-- Search -->
+  <div class="search-card">
+    <div class="search-label">Enter your batch number</div>
+    <div class="search-hint">Found on the bottom or side of the packaging (e.g. 2026.11.02)</div>
+    <div class="search-row">
+      <input type="text" id="batch-input" placeholder="e.g. 2026.11.02" autocomplete="off" inputmode="numeric">
       <button onclick="checkBatch()">Check</button>
     </div>
     <div id="result"></div>
   </div>
 
-  <div class="products-section">
-    <h2>Alle teruggeroepen producten (14)</h2>
-    <div id="product-list"></div>
+  <!-- What happened -->
+  <div class="info-section">
+    <div class="info-card">
+      <h3>What happened?</h3>
+      <p>
+        <strong>Cereulide</strong>, a heat-stable toxin from <em>Bacillus cereus</em>, was found in baby formula.
+        The toxin was traced to contaminated ARA oil (an omega-6 ingredient).
+        It can cause vomiting, cramps, and dehydration in infants.
+        <strong>It is not destroyed by boiling water.</strong>
+      </p>
+    </div>
+    <div class="info-card">
+      <h3>What should I do?</h3>
+      <p>
+        If your batch matches, <strong>stop using the product immediately</strong>.
+        Return it to the store for a full refund. If your baby has symptoms (vomiting, diarrhea), contact your doctor.
+        See <a href="https://www.efsa.europa.eu/en/news/precautionary-global-recall-infant-nutrition-products-following-detection-bacillus-cereus" target="_blank">EFSA advisory</a> for details.
+      </p>
+    </div>
+  </div>
+
+  <!-- Product list -->
+  <div class="section-title">All recalled products</div>
+  <div class="section-subtitle">Tap a product to see recalled batch numbers</div>
+
+  <div class="country-tabs" id="country-tabs"></div>
+  <div id="product-list"></div>
+
+  <!-- Contact info -->
+  <div class="section-title" style="margin-top:32px">Helplines</div>
+  <div class="section-subtitle">Free phone numbers by country</div>
+  <div class="contact-grid">
+    <div class="contact-card">
+      <div class="cc-country">&#127475;&#127473; Netherlands</div>
+      <div class="cc-line">Nutrilon: <span class="cc-phone">0800 022 26 26</span></div>
+    </div>
+    <div class="contact-card">
+      <div class="cc-country">&#127463;&#127466; Belgium</div>
+      <div class="cc-line">Nutrilon: <span class="cc-phone">0800 16 685</span></div>
+    </div>
+    <div class="contact-card">
+      <div class="cc-country">&#127468;&#127463; United Kingdom</div>
+      <div class="cc-line">Aptamil: <span class="cc-phone">0800 996 1000</span><br>Cow & Gate: <span class="cc-phone">0800 977 8880</span></div>
+    </div>
+    <div class="contact-card">
+      <div class="cc-country">&#127470;&#127466; Ireland</div>
+      <div class="cc-line">Aptamil: <span class="cc-phone">1800 22 1234</span><br>Cow & Gate: <span class="cc-phone">1800 570 570</span></div>
+    </div>
+    <div class="contact-card">
+      <div class="cc-country">&#127467;&#127479; France</div>
+      <div class="cc-line">Gallia: <span class="cc-phone">0800 003 798</span></div>
+    </div>
+    <div class="contact-card">
+      <div class="cc-country">&#127462;&#127481; Austria</div>
+      <div class="cc-line">Aptamil: <span class="cc-phone">0800 311 512</span><br>Milumil: <span class="cc-phone">0800 311 756</span></div>
+    </div>
+    <div class="contact-card">
+      <div class="cc-country">&#127464;&#127469; Switzerland</div>
+      <div class="cc-line">Danone: <span class="cc-phone">0800 55 06 09</span></div>
+    </div>
+    <div class="contact-card">
+      <div class="cc-country">&#127470;&#127473; Israel</div>
+      <div class="cc-line">Nutrilon: <span class="cc-phone">1-800-300-123</span></div>
+    </div>
   </div>
 </div>
 
 <div class="footer">
-  Bron: <a href="https://www.danone.com/content/dam/corp/local/bel/Danone%20recall%20in%20the%20Netherlands%20-%20List%20and%20details%20of%20products%20and%20batches%20(1).pdf" target="_blank" rel="noopener">Danone officieel terugroepbericht</a><br>
-  Deze site is niet gelieerd aan Danone. Alleen ter informatie.
+  <p>
+    This site is <strong>not affiliated</strong> with Danone. Information only.<br>
+    Data sourced from official food safety authorities.
+  </p>
+  <div class="sources">
+    <a href="https://www.nvwa.nl/documenten/waarschuwingen/2026/02/06/veiligheidswaarschuwing-verschillende-nutrilon-producten-van-danone" target="_blank">NVWA</a>
+    <a href="https://www.food.gov.uk/news-alerts/alert/fsa-prin-05-2026" target="_blank">FSA UK</a>
+    <a href="https://www.fsai.ie/news-and-alerts/food-alerts/danone-recall-of-batches-of-aptamil-and-cow-gate-i" target="_blank">FSAI</a>
+    <a href="https://favv-afsca.be/nl/producten/terugroeping-van-danone-0" target="_blank">FAVV</a>
+    <a href="https://rappel.conso.gouv.fr/categorie/25" target="_blank">Rappel Conso</a>
+    <a href="https://www.ages.at/mensch/produktwarnungen-produktrueckrufe/produkt/bestimmte-chargen-von-aptamil-und-milumil" target="_blank">AGES</a>
+    <a href="https://corporate.migros.ch/en/news/danone-recalls-various-aptamil-products" target="_blank">Migros</a>
+    <a href="https://www.danone.com/newsroom/press-releases/recall-specific-infant-formula-batches.html" target="_blank">Danone</a>
+  </div>
 </div>
 
 <script>
-const products = [
-  {
-    name: "Nutrilon AR 2 800G",
-    aliases: "",
-    weight: "800g",
-    packaging: "Eazypack",
-    batches: [
-      { batch: "2026.11.02", expiry: "02-11-2026" }
+// =========================================================
+// DATA — All recalled products by country
+// =========================================================
+const data = {
+  "nl": {
+    country: "Netherlands",
+    flag: "\ud83c\uddf3\ud83c\uddf1",
+    brands: ["Nutrilon"],
+    products: [
+      { name: "Nutrilon AR 2", size: "800g", pkg: "Eazypack", batches: [
+        { b: "2026.11.02", e: "02-11-2026" }
+      ]},
+      { name: "Nutrilon opvolgmelk 3", size: "800g", pkg: "Eazypack", batches: [
+        { b: "2026.06.19", e: "19-06-2026" }, { b: "2026.07.29", e: "29-07-2026" },
+        { b: "2026.09.21", e: "21-09-2026" }, { b: "2026.09.22", e: "22-09-2026" },
+        { b: "2026.10.24", e: "24-10-2026" }, { b: "2026.11.07", e: "07-11-2026" },
+        { b: "2026.11.28", e: "28-11-2026" }, { b: "2026.12.22", e: "22-12-2026" }
+      ]},
+      { name: "Nutrilon zuigelingenvoeding 1", size: "800g", pkg: "Eazypack", batches: [
+        { b: "2026.07.13", e: "13-07-2026" }, { b: "2026.07.22", e: "22-07-2026" },
+        { b: "2026.09.05", e: "05-09-2026" }, { b: "2026.10.16", e: "16-10-2026" },
+        { b: "2026.12.03", e: "03-12-2026" }
+      ]},
+      { name: "Nutrilon opvolgmelk 2", size: "800g", pkg: "Eazypack", batches: [
+        { b: "2026.06.07", e: "07-06-2026" }, { b: "2026.07.11", e: "11-07-2026" },
+        { b: "2026.07.27", e: "27-07-2026" }, { b: "2026.09.09", e: "09-09-2026" },
+        { b: "2026.09.17", e: "17-09-2026" }, { b: "2026.10.27", e: "27-10-2026" },
+        { b: "2026.11.21", e: "21-11-2026" }, { b: "2026.12.19", e: "19-12-2026" }
+      ]},
+      { name: "Nutrilon Content 1", size: "800g", pkg: "Eazypack", batches: [
+        { b: "2026.03.04", e: "04-03-2026" }, { b: "2029.09.05", e: "05-09-2026" }
+      ]},
+      { name: "Nutrilon Duobalans 2", size: "800g", pkg: "Tin", batches: [
+        { b: "2026.12.27", e: "27-12-2026" }, { b: "2027.02.01", e: "01-02-2027" },
+        { b: "2027.07.11", e: "11-07-2027" }
+      ]},
+      { name: "Nutrilon Duobalans 1", size: "800g", pkg: "Tin", batches: [
+        { b: "2027.01.12", e: "12-01-2027" }, { b: "2027.05.14", e: "14-05-2027" },
+        { b: "2027.07.10", e: "10-07-2027" }
+      ]},
+      { name: "Nutrilon zuigelingenvoeding 1", size: "1.2kg", pkg: "Bag in box", batches: [
+        { b: "2026.12.04", e: "04-12-2026" }
+      ]},
+      { name: "Nutrilon opvolgmelk 2", size: "1.2kg", pkg: "Bag in box", batches: [
+        { b: "2026.08.26", e: "26-08-2026" }, { b: "2026.11.04", e: "04-11-2026" },
+        { b: "2026.11.19", e: "19-11-2026" }, { b: "2026.12.28", e: "28-12-2026" },
+        { b: "2027.01.02", e: "02-01-2027" }, { b: "2027.02.18", e: "18-02-2027" }
+      ]},
+      { name: "Nutrilon zuigelingenvoeding 1", size: "600g", pkg: "Bag in box", batches: [
+        { b: "2026.08.13", e: "13-08-2026" }, { b: "2026.12.05", e: "05-12-2026" }
+      ]},
+      { name: "Nutrilon opvolgmelk 2", size: "600g", pkg: "Bag in box", batches: [
+        { b: "2026.07.26", e: "26-07-2026" }, { b: "2026.12.05", e: "05-12-2026" },
+        { b: "2027.01.09", e: "09-01-2027" }
+      ]},
+      { name: "Nutrilon Tabs zuigelingenvoeding 1", size: "138g", pkg: "Bag", batches: [
+        { b: "2027.01.01", e: "01-01-2027" }, { b: "2027.01.02", e: "02-01-2027" },
+        { b: "2027.01.09", e: "09-01-2027" }, { b: "2027.01.10", e: "10-01-2027" },
+        { b: "2027.03.02", e: "02-03-2027" }, { b: "2027.03.03", e: "03-03-2027" },
+        { b: "2027.03.07", e: "07-03-2027" }
+      ]},
+      { name: "Nutrilon Tabs opvolgmelk 2", size: "138g", pkg: "Bag", batches: [
+        { b: "2027.01.03", e: "03-01-2027" }, { b: "2027.01.04", e: "04-01-2027" },
+        { b: "2027.01.05", e: "05-01-2027" }, { b: "2027.01.06", e: "06-01-2027" },
+        { b: "2027.01.07", e: "07-01-2027" }, { b: "2027.01.08", e: "08-01-2027" },
+        { b: "2027.02.27", e: "27-02-2027" }, { b: "2027.02.28", e: "28-02-2027" }
+      ]},
+      { name: "Nutrilon Duobalans 1", size: "3x23g", pkg: "Bag", batches: [
+        { b: "2026.10.04", e: "04-10-2026" }
+      ]}
     ]
   },
-  {
-    name: "Nutrilon opvolgmelk 3 800g",
-    aliases: "Nutrilon Pronutra 3 800g / Nutrilon 3 800g",
-    weight: "800g",
-    packaging: "Eazypack",
-    batches: [
-      { batch: "2026.06.19", expiry: "19-06-2026" },
-      { batch: "2026.07.29", expiry: "29-07-2026" },
-      { batch: "2026.09.21", expiry: "21-09-2026" },
-      { batch: "2026.09.22", expiry: "22-09-2026" },
-      { batch: "2026.10.24", expiry: "24-10-2026" },
-      { batch: "2026.11.07", expiry: "07-11-2026" },
-      { batch: "2026.11.28", expiry: "28-11-2026" },
-      { batch: "2026.12.22", expiry: "22-12-2026" }
+  "be": {
+    country: "Belgium",
+    flag: "\ud83c\udde7\ud83c\uddea",
+    brands: ["Nutrilon"],
+    products: [
+      { name: "Nutrilon Profutura 1", size: "800g", pkg: "Tin", batches: [
+        { b: "2027.08.19", e: "19-08-2027" }
+      ]},
+      { name: "Nutrilon AR 2", size: "800g", pkg: "Eazypack", batches: [
+        { b: "2026.10.03", e: "03-10-2026" }
+      ]},
+      { name: "Nutrilon Profutura Duobiotik 1", size: "5x23g", pkg: "Bag in box", batches: [
+        { b: "2026.05.28", e: "28-05-2026" }
+      ]},
+      { name: "Nutrilon opvolgmelk 2", size: "800g", pkg: "Eazypack", batches: [
+        { b: "2026.06.06", e: "06-06-2026" }, { b: "2026.07.12", e: "12-07-2026" },
+        { b: "2026.08.01", e: "01-08-2026" }, { b: "2026.08.31", e: "31-08-2026" },
+        { b: "2026.09.09", e: "09-09-2026" }, { b: "2026.09.15", e: "15-09-2026" },
+        { b: "2026.10.27", e: "27-10-2026" }, { b: "2026.11.29", e: "29-11-2026" },
+        { b: "2026.12.20", e: "20-12-2026" }, { b: "2027.01.23", e: "23-01-2027" }
+      ]},
+      { name: "Nutrilon zuigelingenmelk 1", size: "800g", pkg: "Eazypack", batches: [
+        { b: "2026.07.13", e: "13-07-2026" }, { b: "2026.07.22", e: "22-07-2026" },
+        { b: "2026.08.04", e: "04-08-2026" }, { b: "2026.08.25", e: "25-08-2026" },
+        { b: "2026.10.17", e: "17-10-2026" }, { b: "2026.11.13", e: "13-11-2026" },
+        { b: "2026.11.26", e: "26-11-2026" }
+      ]},
+      { name: "Nutrilon Profutura Duobiotik 1", size: "800g", pkg: "Tin", batches: [
+        { b: "2026.12.28", e: "28-12-2026" }, { b: "2027.04.15", e: "15-04-2027" },
+        { b: "2027.05.13", e: "13-05-2027" }, { b: "2027.06.04", e: "04-06-2027" },
+        { b: "2027.08.19", e: "19-08-2027" }
+      ]},
+      { name: "Nutrilon Profutura Duobiotik 2", size: "800g", pkg: "Tin", batches: [
+        { b: "2026.12.28", e: "28-12-2026" }, { b: "2027.01.10", e: "10-01-2027" },
+        { b: "2027.01.31", e: "31-01-2027" }, { b: "2027.03.12", e: "12-03-2027" },
+        { b: "2027.05.12", e: "12-05-2027" }, { b: "2027.06.05", e: "05-06-2027" },
+        { b: "2027.07.12", e: "12-07-2027" }, { b: "2027.09.03", e: "03-09-2027" }
+      ]}
     ]
   },
-  {
-    name: "Nutrilon volledige zuigelingenvoeding 1 800g",
-    aliases: "Nutrilon Pronutra 1 800g / Nutrilon 1 800g",
-    weight: "800g",
-    packaging: "Eazypack",
-    batches: [
-      { batch: "2026.07.13", expiry: "13-07-2026" },
-      { batch: "2026.07.22", expiry: "22-07-2026" },
-      { batch: "2026.09.05", expiry: "05-09-2026" },
-      { batch: "2026.10.16", expiry: "16-10-2026" },
-      { batch: "2026.12.03", expiry: "03-12-2026" }
+  "uk": {
+    country: "United Kingdom",
+    flag: "\ud83c\uddec\ud83c\udde7",
+    brands: ["Aptamil", "Cow & Gate"],
+    products: [
+      { name: "Aptamil 1 First Infant Milk", size: "800g", pkg: "Tub", batches: [
+        { b: "2026.07.09", e: "09-07-2026" }, { b: "2026.10.31", e: "31-10-2026" },
+        { b: "2026.12.04", e: "04-12-2026" }
+      ]},
+      { name: "Aptamil 1 First Infant Milk", size: "700g", pkg: "Box", batches: [
+        { b: "2026.08.22", e: "22-08-2026" }, { b: "2026.11.26", e: "26-11-2026" }
+      ]},
+      { name: "Aptamil 1 First Infant Milk", size: "1.2kg", pkg: "Big Pack", batches: [
+        { b: "2026.08.14", e: "14-08-2026" }, { b: "2026.12.25", e: "25-12-2026" }
+      ]},
+      { name: "Aptamil 1 Hungry", size: "800g", pkg: "Tub", batches: [
+        { b: "2026.07.04", e: "04-07-2026" }, { b: "2027.02.24", e: "24-02-2027" }
+      ]},
+      { name: "Aptamil 2 Follow On Milk", size: "800g", pkg: "Tub", batches: [
+        { b: "2026.06.18", e: "18-06-2026" }, { b: "2027.01.04", e: "04-01-2027" }
+      ]},
+      { name: "Aptamil 2 Follow On Milk", size: "700g", pkg: "Box", batches: [
+        { b: "2026.08.05", e: "05-08-2026" }, { b: "2027.02.20", e: "20-02-2027" }
+      ]},
+      { name: "Aptamil 2 Follow On Milk", size: "1.2kg", pkg: "Big Pack", batches: [
+        { b: "2026.07.23", e: "23-07-2026" }, { b: "2027.01.13", e: "13-01-2027" }
+      ]},
+      { name: "Cow & Gate 1 First Infant Milk", size: "700g", pkg: "Box", batches: [
+        { b: "2026.07.31", e: "31-07-2026" }, { b: "2027.01.31", e: "31-01-2027" }
+      ]},
+      { name: "Cow & Gate 1 First Infant Milk", size: "800g", pkg: "Tub", batches: [
+        { b: "2026.06.11", e: "11-06-2026" }, { b: "2027.01.25", e: "25-01-2027" }
+      ]},
+      { name: "Cow & Gate 1 First Infant Milk", size: "600g", pkg: "Box", batches: [
+        { b: "2026.08.12", e: "12-08-2026" }, { b: "2027.01.16", e: "16-01-2027" }
+      ]},
+      { name: "Cow & Gate 1 First Infant Milk", size: "1.2kg", pkg: "Big Pack", batches: [
+        { b: "2026.07.11", e: "11-07-2026" }, { b: "2027.02.20", e: "20-02-2027" }
+      ]},
+      { name: "Cow & Gate 1 Hungry", size: "800g", pkg: "Tub", batches: [
+        { b: "2026.07.31", e: "31-07-2026" }, { b: "2027.02.23", e: "23-02-2027" }
+      ]},
+      { name: "Cow & Gate Anti-Reflux", size: "800g", pkg: "Tub", batches: [
+        { b: "2026.06.07", e: "07-06-2026" }, { b: "2027.02.18", e: "18-02-2027" }
+      ]}
     ]
   },
-  {
-    name: "Nutrilon opvolgmelk 2 800g",
-    aliases: "Nutrilon Pronutra 2 800g / Nutrilon 2 800g",
-    weight: "800g",
-    packaging: "Eazypack",
-    batches: [
-      { batch: "2026.06.07", expiry: "07-06-2026" },
-      { batch: "2026.07.11", expiry: "11-07-2026" },
-      { batch: "2026.07.27", expiry: "27-07-2026" },
-      { batch: "2026.09.09", expiry: "09-09-2026" },
-      { batch: "2026.09.17", expiry: "17-09-2026" },
-      { batch: "2026.10.27", expiry: "27-10-2026" },
-      { batch: "2026.11.21", expiry: "21-11-2026" },
-      { batch: "2026.12.19", expiry: "19-12-2026" }
+  "ie": {
+    country: "Ireland",
+    flag: "\ud83c\uddee\ud83c\uddea",
+    brands: ["Aptamil", "Cow & Gate"],
+    products: [
+      { name: "Aptamil 1 First Infant Milk", size: "800g", pkg: "Tub", batches: [
+        { b: "2026.07.05", e: "05-07-2026" }, { b: "2026.07.14", e: "14-07-2026" },
+        { b: "2026.07.24", e: "24-07-2026" }, { b: "2026.08.03", e: "03-08-2026" },
+        { b: "2026.09.03", e: "03-09-2026" }, { b: "2026.10.31", e: "31-10-2026" },
+        { b: "2026.11.11", e: "11-11-2026" }, { b: "2026.11.26", e: "26-11-2026" }
+      ]},
+      { name: "Aptamil 2 Follow On Milk", size: "800g", pkg: "Tub", batches: [
+        { b: "2026.06.07", e: "07-06-2026" }, { b: "2026.07.12", e: "12-07-2026" },
+        { b: "2026.07.20", e: "20-07-2026" }, { b: "2026.07.30", e: "30-07-2026" },
+        { b: "2026.09.17", e: "17-09-2026" }, { b: "2026.10.26", e: "26-10-2026" },
+        { b: "2026.10.28", e: "28-10-2026" }, { b: "2026.11.21", e: "21-11-2026" },
+        { b: "2026.12.05", e: "05-12-2026" }, { b: "2026.12.20", e: "20-12-2026" }
+      ]},
+      { name: "Aptamil Hungry 1", size: "800g", pkg: "Tub", batches: [
+        { b: "2026.07.31", e: "31-07-2026" }, { b: "2026.11.16", e: "16-11-2026" },
+        { b: "2027.02.24", e: "24-02-2027" }
+      ]},
+      { name: "Cow & Gate Anti-Reflux", size: "800g", pkg: "Tub", batches: [
+        { b: "2026.08.01", e: "01-08-2026" }, { b: "2026.12.16", e: "16-12-2026" }
+      ]},
+      { name: "Cow & Gate Hungry", size: "800g", pkg: "Tub", batches: [
+        { b: "2026.07.05", e: "05-07-2026" }, { b: "2027.01.05", e: "05-01-2027" }
+      ]},
+      { name: "Cow & Gate 1 First Infant Milk", size: "800g", pkg: "Tub", batches: [
+        { b: "2026.06.10", e: "10-06-2026" }, { b: "2026.07.07", e: "07-07-2026" },
+        { b: "2026.08.03", e: "03-08-2026" }, { b: "2026.09.20", e: "20-09-2026" },
+        { b: "2026.10.30", e: "30-10-2026" }, { b: "2026.11.08", e: "08-11-2026" },
+        { b: "2026.12.11", e: "11-12-2026" }, { b: "2027.01.05", e: "05-01-2027" }
+      ]}
     ]
   },
-  {
-    name: "Nutrilon Content 1 800g",
-    aliases: "",
-    weight: "800g",
-    packaging: "Eazypack",
-    batches: [
-      { batch: "2026.03.04", expiry: "04-03-2026" },
-      { batch: "2029.09.05", expiry: "05-09-2026" }
+  "ch": {
+    country: "Switzerland",
+    flag: "\ud83c\udde8\ud83c\udded",
+    brands: ["Aptamil"],
+    products: [
+      { name: "Aptamil Pronutra Pre", size: "800g", pkg: "Box", batches: [
+        { b: "2026.07.05", e: "05-07-2026" }, { b: "2026.09.01", e: "01-09-2026" },
+        { b: "2026.10.12", e: "12-10-2026" }, { b: "2026.11.17", e: "17-11-2026" }
+      ]},
+      { name: "Aptamil Pronutra 1", size: "800g", pkg: "Box", batches: [
+        { b: "2026.07.05", e: "05-07-2026" }, { b: "2026.08.08", e: "08-08-2026" },
+        { b: "2026.09.01", e: "01-09-2026" }, { b: "2026.10.30", e: "30-10-2026" }
+      ]},
+      { name: "Aptamil Pronutra 2", size: "800g", pkg: "Box", batches: [
+        { b: "2026.07.11", e: "11-07-2026" }, { b: "2026.07.21", e: "21-07-2026" },
+        { b: "2026.09.14", e: "14-09-2026" }, { b: "2026.10.24", e: "24-10-2026" },
+        { b: "2026.11.19", e: "19-11-2026" }, { b: "2026.12.22", e: "22-12-2026" }
+      ]},
+      { name: "Aptamil Pronutra 2", size: "1.2kg", pkg: "Box", batches: [
+        { b: "2026.10.01", e: "01-10-2026" }, { b: "2026.11.04", e: "04-11-2026" },
+        { b: "2027.01.02", e: "02-01-2027" }
+      ]},
+      { name: "Aptamil Pronutra 3", size: "800g", pkg: "Box", batches: [
+        { b: "2026.07.20", e: "20-07-2026" }, { b: "2026.09.14", e: "14-09-2026" },
+        { b: "2026.11.20", e: "20-11-2026" }
+      ]},
+      { name: "Aptamil Pronutra Junior 12+", size: "800g", pkg: "Box", batches: [
+        { b: "2026.07.11", e: "11-07-2026" }, { b: "2026.07.20", e: "20-07-2026" },
+        { b: "2026.07.30", e: "30-07-2026" }, { b: "2026.09.14", e: "14-09-2026" },
+        { b: "2026.11.20", e: "20-11-2026" }
+      ]},
+      { name: "Aptamil Pronutra Junior 18+", size: "800g", pkg: "Box", batches: [
+        { b: "2026.07.20", e: "20-07-2026" }, { b: "2026.09.14", e: "14-09-2026" },
+        { b: "2026.10.24", e: "24-10-2026" }, { b: "2026.11.19", e: "19-11-2026" },
+        { b: "2026.12.22", e: "22-12-2026" }
+      ]},
+      { name: "Aptamil Pronutra Junior 18+", size: "1.2kg", pkg: "Box", batches: [
+        { b: "2026.10.01", e: "01-10-2026" }, { b: "2026.12.03", e: "03-12-2026" }
+      ]},
+      { name: "Aptamil Pronutra Junior 18+ Vanille", size: "800g", pkg: "Box", batches: [
+        { b: "2026.06.18", e: "18-06-2026" }, { b: "2027.03.20", e: "20-03-2027" },
+        { b: "2027.07.02", e: "02-07-2027" }
+      ]},
+      { name: "Aptamil Profutura Pre", size: "800g", pkg: "Box", batches: [
+        { b: "2027.05.19", e: "19-05-2027" }
+      ]},
+      { name: "Aptamil Profutura 2", size: "800g", pkg: "Box", batches: [
+        { b: "2027.02.16", e: "16-02-2027" }, { b: "2027.05.19", e: "19-05-2027" },
+        { b: "2027.09.03", e: "03-09-2027" }
+      ]}
     ]
   },
-  {
-    name: "Nutrilon Duobalans 2 800g",
-    aliases: "",
-    weight: "800g",
-    packaging: "Blik (metaal)",
-    batches: [
-      { batch: "2026.12.27", expiry: "27-12-2026" },
-      { batch: "2027.02.01", expiry: "01-02-2027" },
-      { batch: "2027.07.11", expiry: "11-07-2027" }
+  "at": {
+    country: "Austria / Germany",
+    flag: "\ud83c\udde6\ud83c\uddf9",
+    brands: ["Aptamil", "Milumil"],
+    products: [
+      { name: "Aptamil Pronutra Pre", size: "800g", pkg: "Box", batches: [
+        { b: "2026.11.19", e: "19-11-2026" }
+      ]},
+      { name: "Aptamil Pronutra Pre", size: "1.2kg", pkg: "Box", batches: [
+        { b: "2026.11.19", e: "19-11-2026" }
+      ]},
+      { name: "Aptamil Pronutra 1 DE", size: "800g", pkg: "Box", batches: [
+        { b: "2026.11.10", e: "10-11-2026" }
+      ]},
+      { name: "Aptamil Profutura Pre D", size: "800g", pkg: "Box", batches: [
+        { b: "2027.04.20", e: "20-04-2027" }, { b: "2027.04.30", e: "30-04-2027" }
+      ]},
+      { name: "Aptamil Profutura DuoAdvance Pre", size: "800g", pkg: "Box", batches: [
+        { b: "2027.04.20", e: "20-04-2027" }, { b: "2027.04.30", e: "30-04-2027" }
+      ]},
+      { name: "Aptamil Profutura DuoAdvance 1", size: "800g", pkg: "Box", batches: [
+        { b: "2027.04.20", e: "20-04-2027" }
+      ]},
+      { name: "Aptamil Profutura DuoAdvance 2", size: "800g", pkg: "Box", batches: [
+        { b: "2027.04.20", e: "20-04-2027" }
+      ]},
+      { name: "Milumil Pre", size: "800g", pkg: "Box", batches: [
+        { b: "2026.07.05", e: "05-07-2026" }, { b: "2026.08.08", e: "08-08-2026" },
+        { b: "2026.09.01", e: "01-09-2026" }, { b: "2026.10.12", e: "12-10-2026" },
+        { b: "2026.10.30", e: "30-10-2026" }, { b: "2026.11.10", e: "10-11-2026" },
+        { b: "2026.11.17", e: "17-11-2026" }, { b: "2026.11.19", e: "19-11-2026" }
+      ]},
+      { name: "Milumil 1", size: "800g", pkg: "Box", batches: [
+        { b: "2026.07.05", e: "05-07-2026" }, { b: "2026.09.01", e: "01-09-2026" },
+        { b: "2026.10.30", e: "30-10-2026" }
+      ]}
     ]
   },
-  {
-    name: "Nutrilon Duobalans 1 800g",
-    aliases: "",
-    weight: "800g",
-    packaging: "Blik (metaal)",
-    batches: [
-      { batch: "2027.01.12", expiry: "12-01-2027" },
-      { batch: "2027.05.14", expiry: "14-05-2027" },
-      { batch: "2027.07.10", expiry: "10-07-2027" }
-    ]
-  },
-  {
-    name: "Nutrilon volledige zuigelingenvoeding 1 1.2kg",
-    aliases: "Nutrilon Bib 1.2kg IF",
-    weight: "1.2kg",
-    packaging: "Bag in box",
-    batches: [
-      { batch: "2026.12.04", expiry: "04-12-2026" }
-    ]
-  },
-  {
-    name: "Nutrilon opvolgmelk 2 1.2kg",
-    aliases: "Nutrilon Bib 1.2kg FO",
-    weight: "1.2kg",
-    packaging: "Bag in box",
-    batches: [
-      { batch: "2026.08.26", expiry: "26-08-2026" },
-      { batch: "2026.11.04", expiry: "04-11-2026" },
-      { batch: "2026.11.19", expiry: "19-11-2026" },
-      { batch: "2026.12.28", expiry: "28-12-2026" },
-      { batch: "2027.01.02", expiry: "02-01-2027" },
-      { batch: "2027.02.18", expiry: "18-02-2027" }
-    ]
-  },
-  {
-    name: "Nutrilon volledig zuigelingenvoeding 1 600g",
-    aliases: "Nutrilon Bib 600g IF",
-    weight: "600g",
-    packaging: "Bag in box",
-    batches: [
-      { batch: "2026.08.13", expiry: "13-08-2026" },
-      { batch: "2026.12.05", expiry: "05-12-2026" }
-    ]
-  },
-  {
-    name: "Nutrilon opvolgmelk 2 600g",
-    aliases: "Nutrilon Bib 600g FO",
-    weight: "600g",
-    packaging: "Bag in box",
-    batches: [
-      { batch: "2026.07.26", expiry: "26-07-2026" },
-      { batch: "2026.12.05", expiry: "05-12-2026" },
-      { batch: "2027.01.09", expiry: "09-01-2027" }
-    ]
-  },
-  {
-    name: "Nutrilon tabs volledige zuigelingenvoeding 1 138g",
-    aliases: "Nutrilon tabs 1 IF 138g",
-    weight: "138g",
-    packaging: "Bag",
-    batches: [
-      { batch: "2027.01.01", expiry: "01-01-2027" },
-      { batch: "2027.01.02", expiry: "02-01-2027" },
-      { batch: "2027.01.09", expiry: "09-01-2027" },
-      { batch: "2027.01.10", expiry: "10-01-2027" },
-      { batch: "2027.03.02", expiry: "02-03-2027" },
-      { batch: "2027.03.03", expiry: "03-03-2027" },
-      { batch: "2027.03.07", expiry: "07-03-2027" }
-    ]
-  },
-  {
-    name: "Nutrilon tabs opvolgmelk 2 138g",
-    aliases: "Nutrilon tabs 2 FO 138G",
-    weight: "138g",
-    packaging: "Bag",
-    batches: [
-      { batch: "2027.01.03", expiry: "03-01-2027" },
-      { batch: "2027.01.04", expiry: "04-01-2027" },
-      { batch: "2027.01.05", expiry: "05-01-2027" },
-      { batch: "2027.01.06", expiry: "06-01-2027" },
-      { batch: "2027.01.07", expiry: "07-01-2027" },
-      { batch: "2027.01.08", expiry: "08-01-2027" },
-      { batch: "2027.02.27", expiry: "27-02-2027" },
-      { batch: "2027.02.28", expiry: "28-02-2027" }
-    ]
-  },
-  {
-    name: "Nutrilon Duobalans 1 3x23g",
-    aliases: "",
-    weight: "69g",
-    packaging: "Bag",
-    batches: [
-      { batch: "2026.10.04", expiry: "04-10-2026" }
+  "il": {
+    country: "Israel",
+    flag: "\ud83c\uddee\ud83c\uddf1",
+    brands: ["Nutrilon"],
+    products: [
+      { name: "Nutrilon Stage 1", size: "800g", pkg: "Tub", batches: [
+        { b: "2027.01.01", e: "01-01-2027" }
+      ]},
+      { name: "Nutrilon AR", size: "900g", pkg: "Tub", batches: [
+        { b: "2026.12.01", e: "01-12-2026" }
+      ]}
     ]
   }
-];
+};
 
-// Build a lookup: normalized batch -> product(s)
+// =========================================================
+// Build batch lookup across ALL countries
+// =========================================================
 const batchLookup = {};
-products.forEach(p => {
-  p.batches.forEach(b => {
-    const key = b.batch.replace(/\D/g, '');
-    if (!batchLookup[key]) batchLookup[key] = [];
-    batchLookup[key].push({ product: p, batch: b });
+for (const [cc, countryData] of Object.entries(data)) {
+  countryData.products.forEach(p => {
+    p.batches.forEach(batch => {
+      const key = batch.b.replace(/\D/g, '');
+      if (!batchLookup[key]) batchLookup[key] = [];
+      batchLookup[key].push({
+        country: countryData.country,
+        flag: countryData.flag,
+        product: p,
+        batch
+      });
+    });
   });
-});
-
-function normalize(input) {
-  return input.replace(/\D/g, '');
 }
 
+// =========================================================
+// Search
+// =========================================================
 function checkBatch() {
   const input = document.getElementById('batch-input').value.trim();
-  const resultEl = document.getElementById('result');
+  const el = document.getElementById('result');
+  if (!input) { el.className = 'result'; el.style.display = 'none'; return; }
 
-  if (!input) {
-    resultEl.className = 'result';
-    resultEl.style.display = 'none';
-    return;
-  }
-
-  const key = normalize(input);
+  const key = input.replace(/\D/g, '');
   const matches = batchLookup[key];
 
   if (matches && matches.length > 0) {
-    const match = matches[0];
-    resultEl.className = 'result danger';
-    resultEl.innerHTML = `
-      <div class="icon">&#9888;&#65039;</div>
-      <h3>Dit product is teruggeroepen!</h3>
-      <p>Het batchnummer <strong>${match.batch.batch}</strong> komt voor in de terugroeplijst.</p>
-      <div class="product-info">
-        <strong>${match.product.name}</strong><br>
-        ${match.product.aliases ? 'Ook bekend als: ' + match.product.aliases + '<br>' : ''}
-        Verpakking: ${match.product.weight} – ${match.product.packaging}<br>
-        Houdbaar tot: ${match.batch.expiry}
+    const m = matches[0];
+    el.className = 'result danger';
+    el.innerHTML = `
+      <div class="result-header">
+        <span class="result-icon">\u26a0\ufe0f</span>
+        <div>
+          <h3>This product has been recalled</h3>
+          <p>Batch <strong>${m.batch.b}</strong> is on the recall list.</p>
+        </div>
       </div>
-      <p style="margin-top: 0.75rem;">
-        <strong>Gebruik dit product niet.</strong> Neem contact op met Danone via
-        <strong>0800-0092</strong> of breng het terug naar de winkel.
-      </p>
+      <div class="result-detail">
+        <strong>${m.product.name}</strong> (${m.product.size})<br>
+        Country: ${m.flag} ${m.country}<br>
+        Best before: ${m.batch.e}<br>
+        Packaging: ${m.product.pkg}
+      </div>
+      <div class="result-action">
+        Do not use this product. Return it to the store for a full refund or contact your local helpline below.
+      </div>
     `;
   } else {
-    resultEl.className = 'result safe';
-    resultEl.innerHTML = `
-      <div class="icon">&#9989;</div>
-      <h3>Niet gevonden in de terugroeplijst</h3>
-      <p>Het batchnummer <strong>${input}</strong> staat niet in de lijst van teruggeroepen producten.
-         Controleer of je het nummer correct hebt ingevoerd.</p>
+    el.className = 'result safe';
+    el.innerHTML = `
+      <div class="result-header">
+        <span class="result-icon">\u2705</span>
+        <div>
+          <h3>Not found in recall list</h3>
+          <p>Batch <strong>${input}</strong> was not found. Double-check the number or browse the full list below.</p>
+        </div>
+      </div>
     `;
   }
 }
 
-// Enter key triggers check
 document.getElementById('batch-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') checkBatch();
 });
 
-// Render product list
+// =========================================================
+// Country tabs & product list
+// =========================================================
+const tabsEl = document.getElementById('country-tabs');
 const listEl = document.getElementById('product-list');
-products.forEach((p, i) => {
-  const card = document.createElement('div');
-  card.className = 'product-card';
-  card.innerHTML = `
-    <h3>${p.name}</h3>
-    <div class="meta">
-      ${p.aliases ? p.aliases + ' &middot; ' : ''}${p.weight} &middot; ${p.packaging} &middot; ${p.batches.length} batch${p.batches.length > 1 ? 'es' : ''}
-    </div>
-    <div class="batches">
-      <div class="batch-list">
-        ${p.batches.map(b => `
-          <div class="batch-item">
-            <span class="bn">${b.batch}</span>
-            <span class="exp">THT ${b.expiry}</span>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `;
-  card.addEventListener('click', () => card.classList.toggle('open'));
-  listEl.appendChild(card);
-});
-</script>
+let activeCountry = 'nl';
 
+function renderTabs() {
+  tabsEl.innerHTML = '';
+  for (const [cc, d] of Object.entries(data)) {
+    const tab = document.createElement('button');
+    tab.className = 'country-tab' + (cc === activeCountry ? ' active' : '');
+    tab.innerHTML = `<span class="flag">${d.flag}</span>${d.country}`;
+    tab.addEventListener('click', () => { activeCountry = cc; renderTabs(); renderProducts(); });
+    tabsEl.appendChild(tab);
+  }
+}
+
+function renderProducts() {
+  const d = data[activeCountry];
+  listEl.innerHTML = '';
+  d.products.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <div class="product-header">
+        <div class="product-header-left">
+          <h4>${p.name}</h4>
+          <div class="product-meta">${p.size} &middot; ${p.pkg}</div>
+        </div>
+        <div style="display:flex;align-items:center">
+          <span class="product-badge">${p.batches.length} batch${p.batches.length > 1 ? 'es' : ''}</span>
+          <svg class="chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+        </div>
+      </div>
+      <div class="product-body">
+        <div class="batch-grid">
+          ${p.batches.map(b => `
+            <div class="batch-row">
+              <span class="batch-num">${b.b}</span>
+              <span class="batch-exp">${b.e}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    card.querySelector('.product-header').addEventListener('click', () => card.classList.toggle('open'));
+    listEl.appendChild(card);
+  });
+}
+
+renderTabs();
+renderProducts();
+</script>
 </body>
 </html>
